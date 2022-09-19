@@ -1,4 +1,4 @@
--- Adminer 4.8.1 MySQL 5.5.5-10.3.34-MariaDB-0ubuntu0.20.04.1 dump
+-- Adminer 4.7.6 MySQL dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -7,10 +7,27 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 SET NAMES utf8mb4;
 
-DROP DATABASE IF EXISTS `oshop`;
-CREATE DATABASE `oshop` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE `oshop`;
+DROP TABLE IF EXISTS `app_user`;
+CREATE TABLE `app_user` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(128) NOT NULL,
+  `password` varchar(60) NOT NULL,
+  `firstname` varchar(64) DEFAULT NULL,
+  `lastname` varchar(64) DEFAULT NULL,
+  `role` enum('admin','catalog-manager') NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '1 => actif\n2 => désactivé/bloqué',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `app_user` (`id`, `email`, `password`, `firstname`, `lastname`, `role`, `status`, `created_at`, `updated_at`) VALUES
+(1,	'philippe@oclock.io',	'rocknroll',	'Philippe',	'Candille',	'admin',	1,	'2022-09-19 07:00:58',	NULL),
+(2,	'lucie@oclock.io',	'cameleon',	'Lucie',	'Copin',	'admin',	1,	'2022-09-19 07:00:58',	NULL),
+(3,	'nicole@oclock.io',	'onews',	'Nicole',	'Café',	'catalog-manager',	1,	'2022-09-19 07:00:58',	NULL);
+
+DROP TABLE IF EXISTS `brand`;
 CREATE TABLE `brand` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL COMMENT 'Le nom de la marque',
@@ -29,6 +46,7 @@ INSERT INTO `brand` (`id`, `name`, `created_at`, `updated_at`) VALUES
 (7,	'PHPieds',	'2018-10-17 09:00:00',	NULL),
 (8,	'oPompes',	'2018-10-17 09:00:00',	NULL);
 
+DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'Le nom de la catégorie',
@@ -46,9 +64,9 @@ INSERT INTO `category` (`id`, `name`, `subtitle`, `picture`, `home_order`, `crea
 (3,	'Cérémonie',	'Bien choisir',	'assets/images/categ3.jpeg',	5,	'2018-10-17 08:00:00',	NULL),
 (4,	'Sortir',	'Faire un tour',	'assets/images/categ4.jpeg',	3,	'2018-10-17 08:00:00',	NULL),
 (5,	'Vintage',	'Découvrir',	'assets/images/categ5.jpeg',	1,	'2018-10-17 08:00:00',	NULL),
-(6,	'Piscine et bains',	NULL,	NULL,	0,	'2018-10-17 08:00:00',	NULL),
-(7,	'Sport',	NULL,	NULL,	0,	'2018-10-17 08:00:00',	NULL);
+(8,	'Test',	'Test',	'http://assets/images/categ3.jpeg',	0,	'2022-09-17 17:54:24',	NULL);
 
+DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL COMMENT 'Le nom du produit',
@@ -94,6 +112,67 @@ INSERT INTO `product` (`id`, `name`, `description`, `picture`, `price`, `rate`, 
 (25,	'Sans dale',	'Nunc vero inanes flatus quorundam vile esse quicquid extra urbis pomerium nascitur aestimant praeter orbos et caelibes, nec credi potest qua obsequiorum diversitate coluntur homines sine liberis Romae.',	'assets/images/produits/25-100dales.jpg',	23.00,	2,	1,	'2018-10-17 11:00:00',	NULL,	7,	4,	4),
 (26,	'Talon aibrille',	'Proinde concepta rabie saeviore, quam desperatio incendebat et fames, amplificatis viribus ardore incohibili in excidium urbium matris Seleuciae efferebantur, quam comes tuebatur Castricius tresque legiones bellicis sudoribus induratae.',	'assets/images/produits/26-oCirage.jpg',	240.00,	5,	1,	'2018-10-17 11:00:00',	NULL,	3,	3,	5);
 
+DROP TABLE IF EXISTS `product_has_tag`;
+CREATE TABLE `product_has_tag` (
+  `product_id` int(10) unsigned NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`tag_id`),
+  KEY `fk_product_has_tag_tag1_idx` (`tag_id`),
+  KEY `fk_product_has_tag_product1_idx` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `product_has_tag` (`product_id`, `tag_id`) VALUES
+(1,	1),
+(1,	7),
+(2,	5),
+(3,	1),
+(3,	6),
+(4,	1),
+(4,	7),
+(5,	3),
+(6,	7),
+(7,	7),
+(8,	1),
+(8,	6),
+(11,	1),
+(11,	3),
+(11,	6),
+(12,	1),
+(12,	2),
+(13,	1),
+(13,	6),
+(14,	6),
+(15,	5),
+(15,	6),
+(18,	1),
+(18,	2),
+(20,	1),
+(20,	3),
+(20,	7),
+(21,	5),
+(22,	5),
+(23,	5),
+(24,	5);
+
+DROP TABLE IF EXISTS `tag`;
+CREATE TABLE `tag` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(32) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `tag` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1,	'oclock',	'2018-10-17 09:00:00',	NULL),
+(2,	'pokemon',	'2018-10-17 09:00:00',	NULL),
+(3,	'films',	'2018-10-17 09:00:00',	NULL),
+(4,	'séries',	'2018-10-17 09:00:00',	NULL),
+(5,	'sport',	'2018-10-17 09:00:00',	NULL),
+(6,	'animal',	'2018-10-17 09:00:00',	NULL),
+(7,	'fun',	'2018-10-17 09:00:00',	NULL);
+
+DROP TABLE IF EXISTS `type`;
 CREATE TABLE `type` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'Le nom du type',
@@ -112,4 +191,4 @@ INSERT INTO `type` (`id`, `name`, `created_at`, `updated_at`) VALUES
 (7,	'Pantoufles',	'2018-10-17 10:00:00',	NULL),
 (8,	'Chaussons',	'2018-10-17 10:00:00',	NULL);
 
--- 2022-08-09 11:56:39
+-- 2022-09-19 07:05:01

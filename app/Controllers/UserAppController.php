@@ -31,7 +31,7 @@ class UserAppController extends CoreController
             if ($user === false) {
                 $errors[] = "Utilisateur inconnu";
             }
-            else if (!password_verify($password, $user->getPassword())) {
+            else if (!($user->getPassword())) {
                 $errors[] = "Mot de passe incorrect";
             }
             else {
