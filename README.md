@@ -12,5 +12,3 @@ Le but est de réaliser le BO d'un e-commerce, le tout en suivant la méthode AG
 - Gestion des permissions pour les différents rôles d'utilisateurs (acl)
 - Gestion d'un module de connexion à ce BO
 - Mise en place d'une protection CSRF
-
-//TODO Demander à Kévin la BDD complète
